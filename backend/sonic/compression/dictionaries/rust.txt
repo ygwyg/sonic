@@ -1,0 +1,74 @@
+use std::collections::{HashMap, HashSet, BTreeMap};
+use std::fmt;
+use std::fs;
+use std::io::{self, Read, Write, BufRead, BufReader};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+use serde::{Deserialize, Serialize};
+use anyhow::{anyhow, Context, Result};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
+pub struct Config {
+    pub name: String,
+    pub value: u32,
+    pub enabled: bool,
+    items: Vec<String>,
+}
+
+#[derive(Debug)]
+pub enum Error {
+    NotFound(String),
+    Io(io::Error),
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::NotFound(s) => write!(f, "not found: {}", s),
+            Error::Io(e) => write!(f, "io: {}", e),
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(e: io::Error) -> Self { Error::Io(e) }
+}
+
+pub trait Service {
+    fn run(&mut self) -> Result<()>;
+}
+
+impl Config {
+    pub fn new(name: &str) -> Self {
+        Self { name: name.to_string(), ..Default::default() }
+    }
+    pub fn len(&self) -> usize { self.items.len() }
+    pub fn is_empty(&self) -> bool { self.items.is_empty() }
+    pub fn get(&self, i: usize) -> Option<&String> { self.items.get(i) }
+}
+
+fn main() -> Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+    let mut map: HashMap<String, u32> = HashMap::new();
+    let contents = fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
+    for (i, line) in contents.lines().enumerate() {
+        if let Some(x) = line.strip_prefix("#") { continue; }
+        match line.parse::<i64>() {
+            Ok(v) => println!("{}", v),
+            Err(e) => eprintln!("error: {:?}", e),
+        }
+    }
+    let v: Vec<_> = items.iter().map(|x| x * 2).filter(|x| *x > 0).collect();
+    let total: u64 = v.iter().sum();
+    while let Some(item) = stack.pop() {}
+    loop { break; }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_basic() { assert_eq!(1 + 1, 2); assert!(true); }
+}
+&self &mut self -> Option< -> Result< Box<dyn Vec<u8> &str String::from .to_string() .unwrap() .expect(" .clone() .as_ref() .iter() .into_iter() .collect() .map(| .and_then(| .unwrap_or( Some( None Ok( Err( impl<T> where T: pub fn let mut const static unsafe async await move dyn ref as in

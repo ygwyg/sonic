@@ -1,0 +1,5 @@
+return function import export const let var if else for while do switch case break continue default class struct enum interface type public private protected static final abstract void int float double bool boolean string char byte long short unsigned signed null nil none true false this self super new delete try catch finally throw throws raise except with as in not and or is lambda yield async await from module package namespace using include define typedef template virtual override extends implements instanceof typeof sizeof
+name value data item index count length size key result error err ok status message config options params args kwargs callback context request response client server handler buffer stream reader writer input output file path url id type list map set dict array object string number
+TODO FIXME NOTE Copyright License MIT Apache Licensed under the  All rights reserved.
+http:// https:// www. .com .org github.com example
+    def ()  {}  []  ->  =>  ==  !=  <=  >=  &&  ||  ++  --  +=  -=  ::  //  /*  */  #  ;  ,  .  :

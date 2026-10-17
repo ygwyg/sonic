@@ -1,0 +1,33 @@
+import type { FC, ReactNode } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+export interface Props {
+  children?: ReactNode;
+  className?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+}
+export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+export type Maybe<T> = T | null | undefined;
+export enum Status { Idle = 'idle', Loading = 'loading', Error = 'error' }
+export const Component: FC<Props> = ({ children, className }) => {
+  const [state, setState] = useState<string | null>(null);
+  useEffect(() => { return () => {}; }, []);
+  return <div className={className}>{children}</div>;
+};
+export default Component;
+export async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, init);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return (await res.json()) as T;
+}
+export function isDefined<T>(x: T | undefined | null): x is T { return x != null; }
+export class Service<T extends object = {}> implements Base {
+  private readonly items: Map<string, T> = new Map();
+  constructor(private readonly options: Options) {}
+  public get(id: string): T | undefined { return this.items.get(id); }
+  protected static create(): Service { return new Service({}); }
+}
+function assertNever(x: never): never { throw new Error(`unexpected ${x}`); }
+const config: Record<string, unknown> = {};
+let value: number = 0; let name: string = ''; let flag: boolean = false; let list: string[] = []; let obj: { [key: string]: any } = {};
+: string : number : boolean : void : any : unknown : never : object : Promise< : Array< : Record< : Partial< : Readonly< : Required< : Pick< : Omit< as const satisfies keyof typeof readonly declare abstract implements extends namespace module

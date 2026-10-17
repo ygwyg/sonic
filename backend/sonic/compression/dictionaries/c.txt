@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <errno.h>
+#include <unistd.h>
+#include <math.h>
+#include <assert.h>
+#include <sys/types.h>
+
+#ifndef HEADER_H
+#define HEADER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
+typedef struct {
+    int id;
+    char name[64];
+    size_t len;
+    uint8_t *data;
+    struct node *next;
+} node_t;
+
+static int compare(const void *a, const void *b);
+static inline uint32_t hash(const char *s);
+
+int main(int argc, char **argv)
+{
+    int i, n = 0;
+    FILE *fp = fopen(argv[1], "rb");
+    if (fp == NULL) {
+        fprintf(stderr, "cannot open %s: %s\n", argv[1], strerror(errno));
+        return EXIT_FAILURE;
+    }
+    char *buf = (char *)malloc(size + 1);
+    if (!buf) { perror("malloc"); exit(1); }
+    memset(buf, 0, size);
+    memcpy(dst, src, n);
+    for (i = 0; i < n; i++) {
+        if (buf[i] == '\0') break;
+    }
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("%s\n", line);
+    }
+    switch (c) {
+    case 'a':
+        break;
+    default:
+        return -1;
+    }
+    free(buf);
+    fclose(fp);
+    return 0;
+}
+unsigned int unsigned char unsigned long long int const char * void * size_t ssize_t int32_t uint32_t int64_t uint64_t uint16_t NULL sizeof( strlen( strcmp( strncpy( snprintf( fprintf( printf( scanf( malloc( calloc( realloc( free( memcpy( memset( fopen( fread( fwrite( fclose( return 0; -> ->next ++ -- += == != && || & | ^ << >> /* */ // 
+#ifdef __cplusplus
+}
+#endif
+#endif

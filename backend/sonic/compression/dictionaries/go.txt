@@ -1,0 +1,72 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+	"sync"
+	"time"
+)
+
+type Config struct {
+	Name    string `json:"name"`
+	Value   int    `json:"value,omitempty"`
+	Enabled bool   `json:"enabled"`
+}
+
+type Service interface {
+	Run(ctx context.Context) error
+	Close() error
+}
+
+func NewService(cfg *Config) (*Service, error) {
+	if cfg == nil {
+		return nil, errors.New("nil config")
+	}
+	return &Service{cfg: cfg}, nil
+}
+
+func (s *Service) Run(ctx context.Context) error {
+	for i := 0; i < n; i++ {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+	}
+	if err != nil {
+		return fmt.Errorf("run: %w", err)
+	}
+	defer wg.Done()
+	var mu sync.Mutex
+	mu.Lock()
+	defer mu.Unlock()
+	go func() {
+	}()
+	ch := make(chan int, 10)
+	m := make(map[string]int)
+	s := make([]string, 0, len(items))
+	for k, v := range m {
+		_ = k
+	}
+	switch x := v.(type) {
+	case string:
+	default:
+	}
+	return nil
+}
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	})
+	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println( fmt.Sprintf( fmt.Printf( strings.Split( strings.Join( strings.TrimSpace( os.Exit(1) os.Getenv( os.ReadFile( time.Now() time.Duration time.Second []byte( string( int( int64( float64( len( append( panic( recover( := != == && || <- ...
+}

@@ -1,0 +1,65 @@
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <cstdio>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+namespace sonic {
+
+template <typename T>
+class Buffer {
+public:
+    explicit Buffer(std::size_t n) : data_(n) {}
+    Buffer(const Buffer&) = default;
+    Buffer(Buffer&&) noexcept = default;
+    Buffer& operator=(const Buffer&) = default;
+    virtual ~Buffer() = default;
+    [[nodiscard]] std::size_t size() const noexcept { return data_.size(); }
+    const T& operator[](std::size_t i) const { return data_[i]; }
+    T& operator[](std::size_t i) { return data_[i]; }
+    auto begin() { return data_.begin(); }
+    auto end() { return data_.end(); }
+private:
+    std::vector<T> data_;
+};
+
+struct Config {
+    std::string name;
+    int value = 0;
+    bool enabled = false;
+};
+
+class Service : public Base {
+public:
+    Service() = default;
+    void run() override;
+    static std::unique_ptr<Service> create(const Config& cfg) { return std::make_unique<Service>(cfg); }
+protected:
+    std::shared_ptr<Config> config_;
+};
+
+}  // namespace sonic
+
+int main(int argc, char* argv[]) {
+    std::vector<int> v = {1, 2, 3};
+    std::unordered_map<std::string, int> counts;
+    for (const auto& x : v) { std::cout << x << '\n'; }
+    for (auto it = v.begin(); it != v.end(); ++it) {}
+    std::sort(v.begin(), v.end(), [](int a, int b) { return a < b; });
+    auto result = std::find_if(v.begin(), v.end(), [&](const auto& x) { return x > 1; });
+    if (auto it = counts.find(key); it != counts.end()) {}
+    try { throw std::runtime_error("error"); } catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
+    std::string s = std::to_string(42);
+    std::optional<int> maybe = std::nullopt;
+    return 0;
+}
+std::string std::vector< std::map< std::unique_ptr< std::shared_ptr< std::make_shared< std::move( std::size_t std::function< std::pair< std::tuple< const auto& constexpr static_cast< reinterpret_cast< dynamic_cast< nullptr override final virtual template <typename T> typename class struct public: private: protected: namespace using namespace ::
