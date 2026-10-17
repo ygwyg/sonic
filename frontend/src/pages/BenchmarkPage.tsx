@@ -534,13 +534,13 @@ function ExperimentCharts({ experiment, summary, records }: { experiment: string
           className="xl:col-span-2"
           caption="Solid: measured net throughput (±95% CI). Dashed: the PHY information rate. At equal bandwidth the PHY information rate is identical by construction (same bits per Hz per second), and only channel effects — echo tolerance via the cyclic prefix, PAPR, and drift sensitivity — differ between carrier counts."
         >
-          <LineSeriesChart data={merged} xKey="x" series={series} xLabel="number of carriers" yLabel="bit rate (bit/s)" height={320} xFormatter={(v) => String(v)} />
+          <LineSeriesChart data={merged} xKey="x" series={series} xLabel="number of carriers (log scale)" yLabel="bit rate (bit/s)" height={320} xScale="log" xFormatter={(v) => String(v)} />
         </Card>
         <Card title="PAPR vs carrier count" caption="Peak-to-average power ratio grows with the number of carriers, which limits how loud the signal can be played without clipping.">
-          <LineSeriesChart data={papr.rows} xKey="x" series={modSeries(papr.series)} xLabel="number of carriers" yLabel="PAPR (dB)" yDomain={["auto", "auto"]} xFormatter={(v) => String(v)} />
+          <LineSeriesChart data={papr.rows} xKey="x" series={modSeries(papr.series)} xLabel="number of carriers (log scale)" yLabel="PAPR (dB)" yDomain={["auto", "auto"]} xScale="log" xFormatter={(v) => String(v)} />
         </Card>
         <Card title="Transmission time vs carrier count" caption="Total airtime for the same payload; differences come from symbol/cyclic-prefix overhead and the fixed header.">
-          <LineSeriesChart data={dur.rows} xKey="x" series={modSeries(dur.series)} xLabel="number of carriers" yLabel="duration (s)" xFormatter={(v) => String(v)} yFormatter={(v) => v.toFixed(2)} />
+          <LineSeriesChart data={dur.rows} xKey="x" series={modSeries(dur.series)} xLabel="number of carriers (log scale)" yLabel="duration (s)" xScale="log" xFormatter={(v) => String(v)} yFormatter={(v) => v.toFixed(2)} />
         </Card>
         <SpectralCard rows={spectral} />
       </div>

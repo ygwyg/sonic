@@ -19,12 +19,23 @@ interface Props {
   yLabel: string;
   height?: number;
   yScale?: "linear" | "log";
+  xScale?: "linear" | "log";
   yDomain?: [number | string, number | string];
   xDomain?: [number | string, number | string];
   xType?: "number" | "category";
   yFormatter?: (v: number) => string;
   xFormatter?: (v: number) => string;
   connectNulls?: boolean;
+}
+
+/** Distinct x values, used as explicit ticks on a log x axis. */
+function logTicks(data: Record<string, unknown>[], xKey: string): number[] {
+  const xs = new Set<number>();
+  for (const r of data) {
+    const v = r[xKey];
+    if (typeof v === "number" && v > 0) xs.add(v);
+  }
+  return Array.from(xs).sort((a, b) => a - b);
 }
 
 /** Generic multi-series line chart with optional ±ci95 error bars. */
@@ -36,6 +47,7 @@ export default function LineSeriesChart({
   yLabel,
   height = 260,
   yScale = "linear",
+  xScale = "linear",
   yDomain,
   xDomain,
   xType = "number",
@@ -51,6 +63,8 @@ export default function LineSeriesChart({
         <XAxis
           dataKey={xKey}
           type={xType}
+          scale={xType === "number" ? xScale : undefined}
+          ticks={xScale === "log" && xType === "number" ? logTicks(data, xKey) : undefined}
           domain={xDomain ?? (xType === "number" ? ["dataMin", "dataMax"] : undefined)}
           tickFormatter={xFormatter}
           label={{ value: xLabel, position: "insideBottom", offset: -12, fill: "#7a8595", fontSize: 11 }}
