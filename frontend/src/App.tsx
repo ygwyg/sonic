@@ -6,7 +6,7 @@ import Trace from "./components/Trace";
 type Tab = "send" | "receive";
 const tabFromHash = (): Tab => (location.hash === "#receive" ? "receive" : "send");
 
-const SOURCE_URL = "https://github.com/ygwyg/overwork/tree/claude/sonic-audio-transmission-qtmn57";
+const SOURCE_URL = "https://github.com/ygwyg/sonic";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>(tabFromHash);
