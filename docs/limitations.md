@@ -1,12 +1,14 @@
 # Known limitations
 
 **Validation scope**
-- Every result in this repository comes from digital loopback or the
-  synthetic channel simulator. No speaker/microphone test has been run in
-  this environment (no audio hardware); `sonic play`/`sonic record` and the
-  browser microphone path are implemented but **unverified on hardware**.
+- Over-the-air tests so far are one laptop and one phone in one room
+  (2026-10-17, see `research_log.md` H7): reliable up to about half a metre,
+  failing at 2 m where room reflections arrive later than the cyclic prefix.
+  Everything else comes from digital loopback or the synthetic simulator.
 - The channel presets ("quiet room", "noisy room", …) are hand-designed
-  impairment models, not measured rooms.
+  impairment models, not measured rooms. Compared with the real room in H7
+  they are too harsh up close and far too gentle at a distance (real
+  reverberant energy at 2 m is close to the direct sound).
 
 **Physical layer**
 - Sample-rate mismatch is tracked by moving the FFT window; if the

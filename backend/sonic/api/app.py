@@ -43,6 +43,7 @@ from sonic.compression import available_algorithms
 from sonic.config import CODE_RATES, MODULATIONS, OFDMConfig, PRESETS, header_config
 from sonic.protocol import PayloadType
 from sonic.receiver import decode
+from sonic.receiver.stream import ListenSession
 from sonic.transmitter import EncodeError, encode, estimate
 
 MAX_UPLOAD_BYTES = int(os.environ.get("SONIC_MAX_UPLOAD_BYTES", 64 * 1024 * 1024))
@@ -266,6 +267,11 @@ async def encode_file(
 @app.post("/api/decode")
 async def decode_endpoint(file: UploadFile = File(...), channel: str = Form("")):
     data = await _read_upload(file, MAX_UPLOAD_BYTES)
+    save_dir = os.environ.get("SONIC_SAVE_UPLOADS")
+    if save_dir:  # dev aid for over-the-air tests: keep every uploaded recording
+        os.makedirs(save_dir, exist_ok=True)
+        with open(os.path.join(save_dir, f"{time.strftime('%Y%m%d-%H%M%S')}-{os.path.basename(file.filename or 'upload.wav')}"), "wb") as fh:
+            fh.write(data)
     clip = _clip_from_upload(data)
     x = clip.samples
     chan = None
@@ -489,6 +495,61 @@ async def benchmark_ws(ws: WebSocket, job_id: str):
             await asyncio.sleep(0.25)
     except WebSocketDisconnect:
         return
+    finally:
+        try:
+            await ws.close()
+        except Exception:
+            pass
+
+
+LISTEN_POLL_S = 0.3
+LISTEN_MAX_S = 15 * 60
+
+
+@app.websocket("/api/listen")
+async def listen_ws(ws: WebSocket):
+    """Continuous receive. First message: {"sample_rate": n} as text; then
+    binary frames of mono little-endian int16 PCM. The server replies with
+    JSON events: listening, receiving (with progress), received, failed."""
+    await ws.accept()
+    loop = asyncio.get_event_loop()
+    try:
+        hello = json.loads(await ws.receive_text())
+        fs = int(hello.get("sample_rate", 0))
+        if not 16000 <= fs <= 192000:
+            await ws.send_json({"type": "error", "error": "sample_rate must be 16-192 kHz"})
+            return
+        session = ListenSession(fs)
+        await ws.send_json({"type": "listening"})
+        started = time.monotonic()
+        since_poll = 0  # samples fed since the last poll; polls are paced by audio, not wall time
+        last_type = "listening"
+        while time.monotonic() - started < LISTEN_MAX_S:
+            msg = await ws.receive()
+            if msg.get("type") == "websocket.disconnect":
+                return
+            if msg.get("bytes"):
+                pcm = np.frombuffer(msg["bytes"], dtype="<i2")
+                session.feed(pcm.astype(np.float64) / 32768.0)
+                since_poll += pcm.size
+            if since_poll < LISTEN_POLL_S * fs:
+                continue
+            since_poll = 0
+            event = await loop.run_in_executor(_executor, session.poll)
+            res = event.pop("result", None)
+            if res is not None and res.success:
+                event.update({k: v for k, v in _decode_payload(res).items() if k in ("data_base64", "text")})
+            if event["type"] != "listening" or last_type != "listening":
+                await ws.send_json(event)
+            last_type = event["type"]
+        await ws.send_json({"type": "error", "error": "listening session timed out"})
+    except (WebSocketDisconnect, RuntimeError):
+        return
+    except (ValueError, json.JSONDecodeError) as e:
+        try:
+            await ws.send_json({"type": "error", "error": f"bad listen stream: {e}"})
+        except Exception:
+            pass
     finally:
         try:
             await ws.close()

@@ -115,6 +115,14 @@ already-compressed sample, `auto` correctly bypassed compression.
 Compression is reported separately from PHY efficiency: it changes the
 number of bits to send, not the bit/s of the link.
 
+**Follow-up (2026-10-17, out-of-sample):** on 40 files per size bucket from
+the Python standard library and npm packages, which the dictionary was not
+written against, code-aware beats zlib/zstd by 5–8 % but loses to Brotli-11
+by ~9 % and to a zstd dictionary trained on held-out files of the same
+language by 13–23 %. The original comparison omitted both baselines and
+tested on files from the same author as the dictionary. Brotli or a trained
+zstd dictionary should replace it.
+
 ## H5 — Presets across synthetic rooms
 
 | channel | audioqr (QPSK, 1024/256) | default (QPSK, 2048/512) | robust (BPSK, 4096/2048) | fast (64-QAM 3/4, 2048/256) |
@@ -150,6 +158,26 @@ resampling second pass restores a 33 dB EVM SNR.
 linearly with bandwidth (85 carriers / 2 kHz → 3.1 kbit/s PHY; 683 carriers
 / 16 kHz → 24.9 kbit/s), while at equal bandwidth it does not change with
 carrier count — the two halves of the same information-theoretic fact.
+
+## H7 — First over-the-air tests (2026-10-17)
+
+MacBook Pro speaker, MacBook Pro microphone or an iPhone browser (Web Audio,
+voice processing off), one ordinary room, `hello.py` (759 B → 397 B).
+
+| path | preset | result | payload EVM SNR |
+|---|---|---|---:|
+| laptop speaker → own mic | audioqr, default, robust, 64-QAM 3/4, fast | all decoded byte-exact | 32–38 dB |
+| laptop → phone, 0.5 m | default | decoded | 21.5 dB |
+| laptop → phone, 2 m | default | header CRC failure | 2.9 dB (header) |
+
+* Sample-rate offset laptop ↔ phone: ≈20 ppm (well inside the tracker's range).
+* At 2 m the in-band signal was 24.7 dB above the room noise, yet the header
+  EVM SNR was 2.9 dB: the loss is inter-symbol interference, not noise.
+  Matched-filtering the chirp showed reflections 11–21 ms after the direct
+  path only ~15 dB down, beyond the default 10.7 ms prefix, plus a long tail
+  (RT60 ≈ 0.4 s). Turning the volume up cannot help.
+* Lossy codecs on the default-preset WAV: MP3 128k and AAC 96k decode
+  (22.7 / 17.4 dB); Opus 32k (voice-note quality) loses every packet.
 
 ## Failed experiments / things that did not work the first time
 

@@ -6,7 +6,8 @@ plays it, and reconstructs the original data **byte-for-byte** from a WAV
 file or a microphone recording, verified with SHA-256. It is also an
 experiment platform: a reproducible benchmark runner, a synthetic channel
 simulator, adaptive bit loading with measured thresholds, a code-aware
-compression study, and a web dashboard with a waveform explorer that shows
+compression study, and a minimal web app for sending and receiving through
+speakers and microphones. The engine also ships analysis code that shows
 how the carriers sum into one signal and how the FFT separates them again.
 
 ```
@@ -25,12 +26,12 @@ NumPy/SciPy and usable without the web interface.
 | demonstration | result |
 |---|---|
 | 1. Digital loopback of a Python program | byte-identical, SHA-256 verified (`examples/demo_loopback.py`) |
-| 2. Overlapping carriers + FFT separation | 341 simultaneous carriers, 0 bit errors recovered from one symbol (`examples/demo_overlap.py`, Explorer page) |
+| 2. Overlapping carriers + FFT separation | 341 simultaneous carriers, 0 bit errors recovered from one symbol (`examples/demo_overlap.py`) |
 | 3. Audio QR | 60-char URL → 1.4 s of sound → decoded from file and through a synthetic noisy room |
 | 4. Density experiment | 16 … 1024 carriers at equal bandwidth: identical PHY rate by construction, net throughput 7.7 → 6.5 kbit/s (64-QAM) due to framing granularity — carrier count does **not** add capacity |
 | 5. Adaptive encoding | per-band bit loading beats the best uniform modulation on 4 of 6 synthetic channels (+2 … +28 %, at 10× lower raw BER), loses by 6 % on a flat channel and 2 % on a notched one (reported as-is) |
-| Tests | 127 automated tests pass (`backend/tests`) |
-| Hardware | speaker/microphone paths implemented, **not verified** (no audio hardware in the build environment) |
+| Tests | 130 automated tests pass (`backend/tests`) |
+| Hardware | MacBook Pro speaker → its own mic: decoded up to 64-QAM 3/4 (≈36 dB). Laptop → phone browser at 0.5 m: decoded (21.5 dB). At 2 m: **fails** (room echoes beyond the cyclic prefix). See `docs/research_log.md` H7 |
 
 Headline throughput through WAV files (48 kHz, 2–10 kHz band, default
 profile): QPSK 1/2 ≈ 5.6 kbit/s PHY, 64-QAM 3/4 ≈ 25 kbit/s PHY, up to
@@ -40,7 +41,7 @@ rooms except the deliberately hostile "difficult" one.
 
 ## Installation
 
-Requirements: Python ≥ 3.12, Node ≥ 20 (for the dashboard only).
+Requirements: Python ≥ 3.12, Node ≥ 20 (for the web app only).
 
 ```bash
 cd backend
@@ -100,33 +101,36 @@ plan = plan_bit_loading(OFDMConfig(), np.array(report.carrier_snr_db), n_bands=8
 cfg = apply_plan(OFDMConfig(), plan)       # band plan travels in the header; receiver needs nothing else
 ```
 
-## Web dashboard
+## Web app
+
+One page, two actions, like scanning a QR code: **Send** (type a message,
+paste a link or drop a file, pick Fast / Balanced / Reliable, press Play)
+and **Receive** (press Listen once; the page streams the microphone to the
+backend over `/api/listen`, which detects the transmission, shows progress
+and decodes it automatically). A received item shows its content, a short
+set of link metrics (signal quality, speed, sound length, bytes on air,
+clock difference, encoding, packets) and two figures: the received
+constellation and signal quality by frequency.
 
 ```bash
 # terminal 1
-cd backend && python -m sonic.cli serve --port 8000
+cd backend && sonic serve --port 8000
 # terminal 2
-cd frontend && npm install && npm run dev      # http://localhost:5173 (proxies /api to :8000)
+cd frontend && npm install && npm run dev            # http://localhost:5173
+# to receive on a phone on the same Wi-Fi (microphone access needs HTTPS):
+cd frontend && SONIC_LAN=1 npm run dev               # https://<your-ip>:5173/#receive, accept the self-signed certificate
 # production: npm run build  → backend serves frontend/dist at /
 ```
 
-Sections: **Transmitter** (text/file → config → estimate → WAV, player with
-volume defaulting to 0.5, optional simulated channel), **Receiver** (upload
-or record, integrity result, download, per-carrier SNR / constellation /
-drift diagnostics), **Waveform Explorer** (envelope with sections, spectrum,
-spectrogram, carrier allocation, overlapping-carrier decomposition, FFT
-separation, constellations, power distribution), **Benchmark Laboratory**
-(run experiments with live WebSocket progress, charts, CSV/JSON export,
-stored results), **Audio QR Studio** (non-technical text ↔ sound).
-Microphone access is only requested when the user clicks record; decoded
-content is displayed as text and never executed.
+Microphone access is only requested when Listen is pressed; decoded content
+is displayed as text and never executed.
 
 ## Repository layout
 
 ```
 backend/sonic/      engine + CLI + API (see docs/architecture.md)
-backend/tests/      127 pytest tests
-frontend/           React + TypeScript + Vite + Tailwind dashboard
+backend/tests/      130 pytest tests
+frontend/           React + TypeScript + Vite web app (send / receive)
 benchmarks/results/ measured results (JSON/CSV) and plots/*.png
 experiments/        reproducible experiment scripts
 examples/           demo scripts and sample audio (examples/audio/*.wav)

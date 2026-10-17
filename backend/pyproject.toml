@@ -20,7 +20,7 @@ audio = ["sounddevice>=0.4"]
 zstd = ["zstandard>=0.21"]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "python-multipart>=0.0.9", "websockets>=12"]
 plots = ["matplotlib>=3.8"]
-dev = ["pytest>=8", "pytest-timeout>=2.3"]
+dev = ["pytest>=8", "pytest-timeout>=2.3", "httpx>=0.27"]
 all = ["sonic-modem[audio,zstd,api,plots,dev]"]
 
 [project.scripts]
