@@ -12,11 +12,14 @@ export default function SendPanel({ onSound }: { onSound: (on: boolean) => void 
   const [mode, setMode] = useState<Mode>("balanced");
   const [state, setState] = useState<State>({ kind: "idle" });
   const [last, setLast] = useState<EncodeResult | null>(null);
-  const [dragging, setDragging] = useState(false);
   const picker = useRef<HTMLInputElement>(null);
 
-  const empty = !file && !text.trim();
   const playing = state.kind === "playing";
+
+  const pick = (f: File | null) => {
+    setFile(f);
+    setLast(null);
+  };
 
   const play = async () => {
     if (playing) {
@@ -40,80 +43,65 @@ export default function SendPanel({ onSound }: { onSound: (on: boolean) => void 
     }
   };
 
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    const f = e.dataTransfer.files?.[0];
-    if (f) setFile(f);
-  };
-
   return (
-    <div className="panel">
-      <div
-        className={`field${dragging ? " is-dragging" : ""}`}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-      >
-        {file ? (
-          <div className="file">
-            <span className="file-name">{file.name}</span>
-            <span className="quiet">{bytes(file.size)}</span>
-            <button className="link" onClick={() => setFile(null)}>
-              Remove
-            </button>
-          </div>
-        ) : (
-          <textarea
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-              setLast(null);
-            }}
-            placeholder="Type a message or paste a link"
-            rows={4}
-            aria-label="Message to send"
-          />
-        )}
-        <div className="field-foot">
-          <button className="link" onClick={() => picker.current?.click()}>
-            {file ? "Choose another file" : "Or choose a file"}
+    <div
+      className="panel"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files?.[0];
+        if (f) pick(f);
+      }}
+    >
+      {file ? (
+        <div className="file">
+          <span>{file.name}</span>
+          <span className="muted">{bytes(file.size)}</span>
+          <button className="link" onClick={() => pick(null)}>
+            Remove
           </button>
-          <input
-            ref={picker}
-            type="file"
-            hidden
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) setFile(f);
-              setLast(null);
-              e.target.value = "";
-            }}
-          />
         </div>
-      </div>
+      ) : (
+        <textarea
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setLast(null);
+          }}
+          placeholder="Type a message, paste a link, or drop a file"
+          rows={4}
+          aria-label="Message"
+        />
+      )}
+      <input
+        ref={picker}
+        type="file"
+        hidden
+        onChange={(e) => {
+          pick(e.target.files?.[0] ?? null);
+          e.target.value = "";
+        }}
+      />
 
-      <ModePicker value={mode} onChange={setMode} />
-
-      <div className="actions">
-        <button className="primary" onClick={play} disabled={empty || state.kind === "encoding"}>
-          {playing ? "Stop" : state.kind === "encoding" ? "Preparing…" : "Play sound"}
+      <div className="row">
+        <button className="button primary" onClick={play} disabled={(!file && !text.trim()) || state.kind === "encoding"}>
+          {playing ? "Stop" : state.kind === "encoding" ? "Preparing…" : "Play"}
         </button>
-        {last && (
-          <p className="quiet">
-            {seconds(last.info.duration_s)} of sound for {bytes(last.info.header.original_length)}
-            {last.info.compression.algorithm !== "none" && <>, compressed to {bytes(last.info.header.payload_length)}</>}.{" "}
-            <button className="link" onClick={() => download(base64ToBytes(last.wav_base64), "sonic.wav", "audio/wav")}>
-              Save as WAV
-            </button>
-          </p>
-        )}
+        <ModePicker value={mode} onChange={setMode} />
+        <button className="link" onClick={() => picker.current?.click()}>
+          Choose file
+        </button>
       </div>
-      {state.kind === "error" && <p className="error">Couldn’t prepare the sound: {state.message}</p>}
+
+      {last && (
+        <p className="muted">
+          {seconds(last.info.duration_s)} of sound.{" "}
+          <button className="link" onClick={() => download(base64ToBytes(last.wav_base64), "sonic.wav", "audio/wav")}>
+            Save WAV
+          </button>
+        </p>
+      )}
+      {state.kind === "error" && <p className="error">{state.message}</p>}
     </div>
   );
 }
-

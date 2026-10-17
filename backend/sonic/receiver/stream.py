@@ -136,6 +136,9 @@ class ListenSession:
             "constellation": ps.get("constellation"),
             "snr_frequencies_hz": (cfg.enabled_data_carriers * cfg.carrier_spacing).round(1).tolist(),
             "snr_db": ps.get("snr_evm_db"),
+            "channel_hz": ps.get("carrier_frequencies_hz"),
+            "channel_db": ps.get("channel_magnitude_db"),
+            "drift_samples": ps.get("timing_drift_samples"),
         }
         return {
             "type": "received" if res.success else "failed",

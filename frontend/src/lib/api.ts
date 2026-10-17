@@ -58,6 +58,9 @@ export interface Received {
     constellation: { re: number[]; im: number[] } | null;
     snr_frequencies_hz: number[];
     snr_db: number[] | null;
+    channel_hz: number[] | null;
+    channel_db: number[] | null;
+    drift_samples: number[] | null;
   };
 }
 

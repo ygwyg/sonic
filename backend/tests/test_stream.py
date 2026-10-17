@@ -37,7 +37,10 @@ def test_receives_two_back_to_back_transmissions():
     assert [e["result"].data for e in got] == [b"first message", b"second message, a little longer" * 4]
     assert any(e["type"] == "receiving" and e.get("progress") for e in events)
     assert got[0]["summary"]["airtime_s"] > 0
-    assert len(got[0]["figures"]["snr_db"]) == len(got[0]["figures"]["snr_frequencies_hz"])
+    fig = got[0]["figures"]
+    assert len(fig["snr_db"]) == len(fig["snr_frequencies_hz"])
+    assert len(fig["channel_db"]) == len(fig["channel_hz"])
+    assert fig["drift_samples"]
 
 
 def test_noise_only_stays_listening_and_buffer_stays_small():

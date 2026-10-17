@@ -38,7 +38,7 @@ export default function ReceivePanel({ onSound }: { onSound: (on: boolean) => vo
       if (session.current !== s) return;
       if (e.type === "listening") setState((p) => (p.kind === "listening" ? p : { kind: "listening" }));
       else if (e.type === "receiving") setState({ kind: "receiving", progress: e.progress, remaining: e.remaining_s, header: e.header });
-      else if (e.type === "failed") setState({ kind: "listening", note: "Heard a transmission but couldn’t read it. Move closer, or use Reliable on the sender." });
+      else if (e.type === "failed") setState({ kind: "listening", note: "Heard something but couldn’t read it. Move closer or try Reliable." });
       else if (e.type === "received") {
         stop();
         setState({ kind: "received", event: e });
@@ -75,9 +75,9 @@ export default function ReceivePanel({ onSound }: { onSound: (on: boolean) => vo
 
   return (
     <div className="panel">
-      <div className="listen">
+      <div className="row">
         <button
-          className={`listen-button${active ? " is-on" : ""}`}
+          className="button primary"
           onClick={() => {
             if (active) {
               stop();
@@ -86,32 +86,23 @@ export default function ReceivePanel({ onSound }: { onSound: (on: boolean) => vo
           }}
           aria-pressed={active}
         >
-          {active ? "Stop" : state.kind === "received" ? "Listen again" : "Listen"}
+          {active ? "Stop" : "Listen"}
         </button>
-        <div className="listen-status" aria-live="polite">
-          {state.kind === "idle" && <p>Hold this device near the one playing the sound.</p>}
-          {state.kind === "starting" && <p>Starting the microphone…</p>}
-          {state.kind === "listening" && (
-            <>
-              <p>Listening.</p>
-              {state.note && <p className="quiet">{state.note}</p>}
-            </>
-          )}
-          {state.kind === "receiving" && (
-            <>
-              <p>
-                Receiving{state.header?.filename ? ` ${state.header.filename}` : ""}
-                {state.remaining != null && state.remaining > 0.5 ? `, ${seconds(state.remaining)} left` : "…"}
-              </p>
-              <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((state.progress ?? 0) * 100)}>
-                <span style={{ width: `${(state.progress ?? 0.02) * 100}%` }} />
-              </div>
-            </>
-          )}
-          {state.kind === "received" && <p>Received and verified.</p>}
-          {state.kind === "error" && <p className="error">{state.message}</p>}
-        </div>
+        <span className="status" aria-live="polite">
+          {state.kind === "idle" && "Hold this device near the one playing."}
+          {state.kind === "starting" && "Starting the microphone…"}
+          {state.kind === "listening" && (state.note ?? "Listening…")}
+          {state.kind === "receiving" &&
+            `Receiving${state.remaining != null && state.remaining > 0.5 ? `, ${seconds(state.remaining)} left` : "…"}`}
+          {state.kind === "received" && "Received."}
+        </span>
       </div>
+      {state.kind === "receiving" && (
+        <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((state.progress ?? 0) * 100)}>
+          <span style={{ width: `${(state.progress ?? 0.02) * 100}%` }} />
+        </div>
+      )}
+      {state.kind === "error" && <p className="error">{state.message}</p>}
       {state.kind === "received" && <Result event={state.event} />}
     </div>
   );
