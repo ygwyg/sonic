@@ -88,7 +88,7 @@ def plot_carrier_density(res_dir: str, out_dir: str) -> list[str]:
     axes[0].set_title("Throughput vs carrier count")
     axes[1].set_xlabel("carriers")
     axes[1].set_ylabel("info bit/s/Hz")
-    axes[1].set_title("Spectral efficiency (identical by construction)")
+    axes[1].set_title("Spectral efficiency (same by construction, band-edge rounding aside)")
     axes[2].set_xlabel("carriers")
     axes[2].set_ylabel("PAPR (dB)")
     axes[2].set_title("Peak-to-average power ratio")

@@ -84,15 +84,15 @@ QPSK 1/2, the best *uniform* modulation/rate the report supports
 (net successfully-delivered bit/s, 3 trials each, all CI95 = 0 because
 every trial decoded; `adaptive.json`.)
 
-**Conclusion:** adaptive loading wins on 5 of 6 frequency-selective
-channels (+6 % to +28 % over the best uniform choice, 2.2–3× over the
-naive default). On the flat channel the uniform baseline is *better* by
+**Conclusion:** adaptive loading wins on 4 of 6 channels (+2 % to +28 %
+over the best uniform choice, 2.2–3× over the naive default) and loses
+narrowly on two. On the flat channel the uniform baseline is better by
 6 %: the planner's 25th-percentile band SNR plus 1 dB margin picks rate 2/3
-where 3/4 would have worked. This is reported as-is; the margin is a
-tunable reliability/throughput knob. On the notched channel `fixed_best`
-succeeded with a 2.9 % raw BER, right at the FEC cliff, whereas adaptive
-delivered nearly the same rate at 0.19 % BER — the reliability gain does
-not show in throughput alone.
+where 3/4 would have worked. On the notched channel `fixed_best` is 2 %
+faster but succeeded with a 2.9 % raw BER, right at the FEC cliff, whereas
+adaptive delivered its rate at 0.19 % BER — the reliability gain does not
+show in throughput alone. Both are reported as-is; the margin is a tunable
+reliability/throughput knob.
 
 Feedback overhead is 9 bytes per report; the band plan itself costs
 nothing extra because the header already carries it.

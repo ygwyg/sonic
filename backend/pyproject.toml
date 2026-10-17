@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sonic-modem"
 version = "0.1.0"
 description = "Sonic: high-density OFDM acoustic data transmission engine and experiment platform"
-readme = "../README.md"
+readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 dependencies = [

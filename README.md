@@ -28,7 +28,7 @@ NumPy/SciPy and usable without the web interface.
 | 2. Overlapping carriers + FFT separation | 341 simultaneous carriers, 0 bit errors recovered from one symbol (`examples/demo_overlap.py`, Explorer page) |
 | 3. Audio QR | 60-char URL → 1.4 s of sound → decoded from file and through a synthetic noisy room |
 | 4. Density experiment | 16 … 1024 carriers at equal bandwidth: identical PHY rate by construction, net throughput 7.7 → 6.5 kbit/s (64-QAM) due to framing granularity — carrier count does **not** add capacity |
-| 5. Adaptive encoding | per-band bit loading beats the best uniform modulation on 5 of 6 frequency-selective synthetic channels (+6 … +28 %), loses by 6 % on a flat channel (reported as-is) |
+| 5. Adaptive encoding | per-band bit loading beats the best uniform modulation on 4 of 6 synthetic channels (+2 … +28 %, at 10× lower raw BER), loses by 6 % on a flat channel and 2 % on a notched one (reported as-is) |
 | Tests | 127 automated tests pass (`backend/tests`) |
 | Hardware | speaker/microphone paths implemented, **not verified** (no audio hardware in the build environment) |
 
