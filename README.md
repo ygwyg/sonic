@@ -3,7 +3,7 @@
 Send text and files through sound. Play it on one device, listen on another,
 and the data arrives byte-for-byte or not at all.
 
-![A message as sound: spectrogram and tone map from the Explore tab](docs/screenshot.png)
+![Where the tones sit, and three of them as sine waves, from the Explore tab](docs/screenshot.png)
 
 - **Send:** type a message or drop a file, press Play.
 - **Receive:** press Listen. It picks up the transmission and decodes it on its own.
