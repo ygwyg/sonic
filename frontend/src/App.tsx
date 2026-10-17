@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
+import Explore from "./components/Explore";
 import ReceivePanel from "./components/ReceivePanel";
 import SendPanel from "./components/SendPanel";
 import Trace from "./components/Trace";
+import type { EncodeResult } from "./lib/api";
 
-type Tab = "send" | "receive";
-const tabFromHash = (): Tab => (location.hash === "#receive" ? "receive" : "send");
+type Tab = "send" | "receive" | "explore";
+const TABS: [Tab, string][] = [
+  ["send", "Send"],
+  ["receive", "Receive"],
+  ["explore", "Explore"],
+];
+const tabFromHash = (): Tab => (location.hash === "#receive" ? "receive" : location.hash === "#explore" ? "explore" : "send");
 
 export default function App() {
   const [tab, setTab] = useState<Tab>(tabFromHash);
   const [sound, setSound] = useState(false);
+  const [sent, setSent] = useState<EncodeResult | null>(null);
 
   useEffect(() => {
     const on = () => setTab(tabFromHash());
@@ -17,7 +25,7 @@ export default function App() {
   }, []);
 
   const choose = (t: Tab) => {
-    history.replaceState(null, "", t === "receive" ? "#receive" : location.pathname);
+    history.replaceState(null, "", t === "send" ? location.pathname : `#${t}`);
     setTab(t);
   };
 
@@ -32,16 +40,18 @@ export default function App() {
       <p className="muted">Send text and files through sound.</p>
 
       <nav className="tabs" role="tablist">
-        {(["send", "receive"] as Tab[]).map((t) => (
+        {TABS.map(([t, label]) => (
           <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? "is-on" : ""} onClick={() => choose(t)}>
-            {t === "send" ? "Send" : "Receive"}
+            {label}
           </button>
         ))}
       </nav>
 
       <Trace active={sound} />
 
-      {tab === "send" ? <SendPanel onSound={setSound} /> : <ReceivePanel onSound={setSound} />}
+      {tab === "send" && <SendPanel onSound={setSound} onEncoded={setSent} />}
+      {tab === "receive" && <ReceivePanel onSound={setSound} />}
+      {tab === "explore" && <Explore sent={sent} />}
     </main>
   );
 }

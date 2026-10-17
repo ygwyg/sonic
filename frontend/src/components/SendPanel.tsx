@@ -6,7 +6,7 @@ import ModePicker from "./ModePicker";
 
 type State = { kind: "idle" } | { kind: "encoding" } | { kind: "playing"; pb: Playback } | { kind: "error"; message: string };
 
-export default function SendPanel({ onSound }: { onSound: (on: boolean) => void }) {
+export default function SendPanel({ onSound, onEncoded }: { onSound: (on: boolean) => void; onEncoded: (r: EncodeResult) => void }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [mode, setMode] = useState<Mode>("balanced");
@@ -31,6 +31,7 @@ export default function SendPanel({ onSound }: { onSound: (on: boolean) => void 
     try {
       const res = file ? await encodeFile(file, mode) : await encodeText(text, mode);
       setLast(res);
+      onEncoded(res);
       const pb = await playWav(base64ToBytes(res.wav_base64));
       setState({ kind: "playing", pb });
       onSound(true);

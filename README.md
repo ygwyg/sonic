@@ -5,6 +5,7 @@ and the data arrives byte-for-byte or not at all.
 
 - **Send:** type a message or drop a file, press Play.
 - **Receive:** press Listen. It picks up the transmission and decodes it on its own.
+- **Explore:** see the sound itself: waveform, spectrum, spectrogram, the tones and how they separate.
 - Every transfer is checked against a SHA-256 fingerprint.
 - Works across a desk (tested laptop → phone at half a metre). Not yet across a room.
 

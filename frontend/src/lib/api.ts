@@ -30,8 +30,33 @@ export interface Header {
   config: Config;
 }
 
+export interface Allocation {
+  frequencies_hz: number[];
+  roles: string[];
+  n_data: number;
+  n_pilot: number;
+}
+
+export interface Analysis {
+  waveform: { sample_rate: number; n_samples: number; duration_s: number; envelope: { index: number[]; min: number[]; max: number[] } };
+  spectrum: { frequency_hz: number[]; power_db: number[] };
+  spectrogram: { time_s: number[]; frequency_hz: number[]; db: number[][]; db_min: number; db_max: number };
+  allocation?: Allocation;
+  header_allocation?: Allocation;
+  sections?: { name: string; start: number; end: number }[];
+  carriers_demo?: {
+    shown: number;
+    n_total_carriers: number;
+    composite: number[];
+    components: { frequency_hz: number; samples: number[] }[];
+    carrier_phases: number[];
+    carrier_frequencies_hz: number[];
+  };
+}
+
 export interface EncodeResult {
   wav_base64: string;
+  analysis: Analysis;
   info: {
     duration_s: number;
     net_bitrate_bps: number;

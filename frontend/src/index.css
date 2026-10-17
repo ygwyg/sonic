@@ -310,6 +310,52 @@ textarea::placeholder {
   vector-effect: non-scaling-stroke;
 }
 
+.fig-faint {
+  stroke-opacity: 0.6;
+}
+
+.fig-area {
+  fill: currentColor;
+}
+
+.fig-mark {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.fig-tick {
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.spectrogram {
+  aspect-ratio: 600 / 220;
+  image-rendering: auto;
+}
+
+.explore {
+  display: grid;
+  gap: 32px;
+}
+
+.fig-span {
+  fill: currentColor;
+  fill-opacity: 0.12;
+}
+
+.explore .fig-label {
+  font-size: 13px;
+}
+
+.explore figcaption {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
 .fig-band {
   fill: currentColor;
   fill-opacity: 0.1;
