@@ -590,8 +590,61 @@ function ExperimentCharts({ experiment, summary, records }: { experiment: string
     );
   }
 
+  if (experiment === "cp_vs_reverb") {
+    const tp = pivot(s, "rt60_s", "cp_len", "net_bitrate_bps_mean", "net_bitrate_bps_ci95");
+    const sr = pivot(s, "rt60_s", "cp_len", "success_rate");
+    const cpSeries = (names: string[]) => [...names].sort((a, b) => Number(a) - Number(b)).map((k, i) => ({ key: k, name: `CP ${k}`, color: SERIES[i % SERIES.length] }));
+    return (
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card title="Net throughput vs reverberation time by cyclic prefix" caption="Longer cyclic prefixes absorb more echo (RT60) at the cost of per-symbol overhead (±95% CI).">
+          <LineSeriesChart data={tp.rows} xKey="x" series={cpSeries(tp.series).map((x) => ({ ...x, errorKey: `${x.key}_err` }))} xLabel="RT60 (s)" yLabel="net bit rate (bit/s)" />
+        </Card>
+        <Card title="Success rate vs reverberation time by cyclic prefix" caption="Fraction of bit-exact reconstructions.">
+          <LineSeriesChart data={sr.rows} xKey="x" series={cpSeries(sr.series)} xLabel="RT60 (s)" yLabel="success rate" yDomain={[0, 1]} yFormatter={(v) => v.toFixed(2)} />
+        </Card>
+      </div>
+    );
+  }
+
+  if (experiment === "density_vs_bandwidth") {
+    const tp = pivot(s, "target_carriers", "label", "net_bitrate_bps_mean", "net_bitrate_bps_ci95");
+    const phy = pivot(s, "target_carriers", "label", "info_bitrate_bps");
+    const merged = tp.rows.map((r) => {
+      const p = phy.rows.find((q) => q.x === r.x) ?? {};
+      const o: Record<string, unknown> = { ...r };
+      for (const m of phy.series) o[`${m}_phy`] = p[m] ?? null;
+      return o;
+    });
+    const series: LineSeries[] = [
+      ...tp.series.map((k, i) => ({ key: k, name: k, errorKey: `${k}_err`, color: SERIES[i % SERIES.length] })),
+      ...phy.series.map((k, i) => ({ key: `${k}_phy`, name: `${k} PHY info rate`, color: SERIES[i % SERIES.length], dashed: true })),
+    ];
+    return (
+      <Card title="Throughput vs carrier count by bandwidth policy" caption="Solid: measured net throughput (±95% CI). Dashed: PHY information rate. With equal bandwidth the PHY rate is identical by construction; with equal spacing the bandwidth (and rate) scales with carrier count.">
+        <LineSeriesChart data={merged} xKey="x" series={series} xLabel="number of carriers (log scale)" yLabel="bit rate (bit/s)" height={320} xScale="log" xFormatter={(v) => String(v)} />
+      </Card>
+    );
+  }
+
+  if (experiment === "sro_tolerance") {
+    const withKey = s.map((r) => ({ ...r, mr: `${r.modulation ?? ""} ${r.code_rate ?? ""}`.trim() }));
+    const tp = pivot(withKey, "ppm", "mr", "net_bitrate_bps_mean", "net_bitrate_bps_ci95");
+    const sr = pivot(withKey, "ppm", "mr", "success_rate");
+    const ser = (names: string[], err: boolean) => names.map((k, i) => ({ key: k, name: k, color: SERIES[i % SERIES.length], errorKey: err ? `${k}_err` : undefined }));
+    return (
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card title="Net throughput vs sample-rate offset" caption="Clock mismatch between transmitter and receiver in parts per million; the pilot-based tracker compensates up to a limit (±95% CI).">
+          <LineSeriesChart data={tp.rows} xKey="x" series={ser(tp.series, true)} xLabel="sample-rate offset (ppm)" yLabel="net bit rate (bit/s)" />
+        </Card>
+        <Card title="Success rate vs sample-rate offset" caption="Fraction of bit-exact reconstructions.">
+          <LineSeriesChart data={sr.rows} xKey="x" series={ser(sr.series, false)} xLabel="sample-rate offset (ppm)" yLabel="success rate" yDomain={[0, 1]} yFormatter={(v) => v.toFixed(2)} />
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <Card title="Summary">
+    <Card title="Summary" caption="No dedicated chart for this experiment; raw summary rows are shown.">
       <pre className="plain max-h-80 overflow-auto text-xs text-ink2">{JSON.stringify(summary.slice(0, 50), null, 1)}</pre>
     </Card>
   );

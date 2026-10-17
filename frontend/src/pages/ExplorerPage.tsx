@@ -165,7 +165,7 @@ function EncodeExplorer({ r }: { r: EncodeResponse }) {
         <NumberStat label="Duration" value={fmtS(r.info.duration_s)} />
         <NumberStat label="Sample rate" value={fmtInt(cfg.sample_rate)} unit="Hz" />
         <NumberStat label="Modulation" value={`${cfg.modulation} · ${cfg.code_rate}`} />
-        <NumberStat label="Band" value={`${fmtHz(cfg.f_low)} – ${fmtHz(cfg.f_high)}`} />
+        <NumberStat label="Band" value={`${(cfg.f_low / 1000).toFixed(1)}–${(cfg.f_high / 1000).toFixed(1)} kHz`} />
         <NumberStat label="Carriers (data/pilot)" value={`${cfg.n_enabled_data_carriers} / ${cfg.n_pilot_carriers}`} />
         <NumberStat label="PAPR" value={fmtDb(r.info.papr_db)} />
       </StatGrid>
@@ -305,7 +305,7 @@ function CarriersDemoPanel({ demo, sampleRate }: { demo: CarriersDemo; sampleRat
           <LineChart data={rows} margin={{ top: 4, right: 12, left: 4, bottom: 16 }} syncId="carriers">
             <CartesianGrid strokeDasharray="2 4" />
             <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tickFormatter={(v: number) => v.toFixed(1)} label={{ value: "time (ms)", position: "insideBottom", offset: -8, fill: "#7a8595", fontSize: 11 }} stroke="#262d38" />
-            <YAxis width={48} tickFormatter={(v: number) => v.toFixed(2)} label={{ value: "amplitude", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
+            <YAxis width={60} tickFormatter={(v: number) => v.toFixed(2)} label={{ value: "amplitude", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
             <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => v.toFixed(4)} labelFormatter={(v: number) => `${v.toFixed(3)} ms`} />
             <Line dataKey="composite" name="composite symbol" dot={false} stroke="#e8ebef" strokeWidth={1.5} isAnimationActive={false} />
             {showSum && <Line dataKey="sum" name="sum of enabled components" dot={false} stroke={SERIES[1]} strokeWidth={1.5} strokeDasharray="4 3" isAnimationActive={false} />}
@@ -315,7 +315,7 @@ function CarriersDemoPanel({ demo, sampleRate }: { demo: CarriersDemo; sampleRat
           <LineChart data={rows} margin={{ top: 4, right: 12, left: 4, bottom: 16 }} syncId="carriers">
             <CartesianGrid strokeDasharray="2 4" />
             <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tickFormatter={(v: number) => v.toFixed(1)} label={{ value: "time (ms)", position: "insideBottom", offset: -8, fill: "#7a8595", fontSize: 11 }} stroke="#262d38" />
-            <YAxis width={48} tickFormatter={(v: number) => v.toFixed(2)} label={{ value: "amplitude", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
+            <YAxis width={60} tickFormatter={(v: number) => v.toFixed(2)} label={{ value: "amplitude", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
             <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => v.toFixed(4)} labelFormatter={(v: number) => `${v.toFixed(3)} ms`} />
             {demo.components.map((c, k) =>
               enabled[k] ? <Line key={c.carrier} dataKey={`c${k}`} name={`carrier ${c.carrier} (${c.frequency_hz.toFixed(0)} Hz)`} dot={false} stroke={SERIES[k % SERIES.length]} strokeWidth={1.25} isAnimationActive={false} /> : null
@@ -339,7 +339,7 @@ function CarriersDemoPanel({ demo, sampleRate }: { demo: CarriersDemo; sampleRat
               <LineChart data={fftRows} margin={{ top: 8, right: 16, left: 8, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="2 4" />
                 <XAxis dataKey="f" type="number" domain={["dataMin", "dataMax"]} tickFormatter={(v: number) => `${(v / 1000).toFixed(1)}k`} label={{ value: "frequency (Hz)", position: "insideBottom", offset: -12, fill: "#7a8595", fontSize: 11 }} stroke="#262d38" />
-                <YAxis width={48} domain={[-Math.PI, Math.PI]} ticks={[-Math.PI, -Math.PI / 2, 0, Math.PI / 2, Math.PI]} tickFormatter={(v: number) => `${(v / Math.PI).toFixed(1)}π`} label={{ value: "phase (rad)", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
+                <YAxis width={60} domain={[-Math.PI, Math.PI]} ticks={[-Math.PI, -Math.PI / 2, 0, Math.PI / 2, Math.PI]} tickFormatter={(v: number) => `${(v / Math.PI).toFixed(1)}π`} label={{ value: "phase (rad)", angle: -90, position: "insideLeft", offset: 12, fill: "#7a8595", fontSize: 11, style: { textAnchor: "middle" } }} stroke="#262d38" />
                 <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => [`${v.toFixed(3)} rad`, "phase"]} labelFormatter={(v: number) => `${v.toFixed(1)} Hz`} />
                 <Line dataKey="phase" dot={{ r: 2, strokeWidth: 0, fill: SERIES[4] }} stroke="none" isAnimationActive={false} />
               </LineChart>
